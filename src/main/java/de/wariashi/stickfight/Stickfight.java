@@ -11,10 +11,21 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Stickfight extends JavaPlugin {
 	private Configuration configuration;
+	private GlassPaneService glassPaneService;
+
+	@Override
+	public void onDisable() {
+		glassPaneService.stop();
+	}
 
 	@Override
 	public void onEnable() {
+		var worlds = Bukkit.getWorlds();
+		var overworld = worlds.getFirst();
+
 		configuration = new Configuration(this);
+		glassPaneService = new GlassPaneService(this, overworld);
+		glassPaneService.start();
 
 		var scheduler = Bukkit.getScheduler();
 		scheduler.runTaskTimer(this, this::giveSticks, 0, 1);
