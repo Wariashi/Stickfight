@@ -6,18 +6,47 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Stickfight extends JavaPlugin {
+public class Stickfight extends JavaPlugin implements Listener {
 	private Configuration configuration;
 
 	@Override
 	public void onEnable() {
 		configuration = new Configuration(this);
 
+		var pluginManager = Bukkit.getPluginManager();
+		pluginManager.registerEvents(this, this);
+
 		var scheduler = Bukkit.getScheduler();
 		scheduler.runTaskTimer(this, this::giveSticks, 0, 1);
+	}
+
+	/**
+	 * Cancels {@link PlayerInteractEvent interactions} of {@link Player players} that are not in
+	 * {@link GameMode#CREATIVE creative mode} except for interactions with {@link Material#BELL bell blocks}.
+	 *
+	 * @param event the event that is called when a player interacts with a block
+	 */
+	@EventHandler
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		var player = event.getPlayer();
+		var gameMode = player.getGameMode();
+		if (gameMode == GameMode.CREATIVE) {
+			return;
+		}
+
+		var block = event.getClickedBlock();
+		if (block != null) {
+			var material = block.getType();
+			if (material != Material.BELL) {
+				event.setCancelled(true);
+			}
+		}
 	}
 
 	/**
