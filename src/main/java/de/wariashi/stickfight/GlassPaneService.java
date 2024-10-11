@@ -6,7 +6,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -109,12 +108,13 @@ public class GlassPaneService implements Listener {
 
 		// add placeholder
 		var location = block.getLocation();
-		var armorStand = (ArmorStand) world.spawnEntity(location, EntityType.ARMOR_STAND);
+		var armorStand = world.createEntity(location, ArmorStand.class);
 		armorStand.addScoreboardTag(placeholderTag);
 		armorStand.setBasePlate(false);
 		armorStand.setGravity(false);
 		armorStand.setInvisible(true);
 		armorStand.setMarker(true);
+		world.addEntity(armorStand);
 
 		// break block
 		block.breakNaturally();
