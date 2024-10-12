@@ -2,9 +2,9 @@ package de.wariashi.stickfight;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +12,33 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Stickfight extends JavaPlugin {
 	private Configuration configuration;
 	private GlassPaneService glassPaneService;
+
+	/**
+	 * Tests whether a {@link Location} is within the area that is specified in the {@link Configuration}.
+	 * If the area is unlimited, this method will always return <code>true</code>.
+	 *
+	 * @param location the {@link Location} to test
+	 * @return <code>true</code> if the {@link Location} is within the area, <code>false</code> otherwise
+	 */
+	public boolean isWithinConfinedArea(Location location) {
+		var isUnlimited = configuration.isUnlimited();
+		if (isUnlimited) {
+			return true;
+		}
+
+		var maxX = configuration.getMaxX();
+		var maxY = configuration.getMaxY();
+		var maxZ = configuration.getMaxZ();
+		var minX = configuration.getMinX();
+		var minY = configuration.getMinY();
+		var minZ = configuration.getMinZ();
+
+		var x = location.getBlockX();
+		var y = location.getBlockY();
+		var z = location.getBlockZ();
+
+		return minX <= x && x <= maxX && minY <= y && y <= maxY && minZ <= z && z <= maxZ;
+	}
 
 	@Override
 	public void onDisable() {
@@ -40,40 +67,13 @@ public class Stickfight extends JavaPlugin {
 		var players = Bukkit.getOnlinePlayers().toArray(new Player[0]);
 		for (var player : players) {
 			var gameMode = player.getGameMode();
-			if (gameMode == GameMode.ADVENTURE && isWithinConfinedArea(player)) {
+			var location = player.getLocation();
+			if (gameMode == GameMode.ADVENTURE && isWithinConfinedArea(location)) {
 				var stick = new ItemStack(Material.STICK);
 				stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 5);
 				var inventory = player.getInventory();
 				inventory.setItem(0, stick);
 			}
 		}
-	}
-
-	/**
-	 * Tests whether an {@link Entity} is within the area that is specified in the {@link Configuration}.
-	 * If the area is unlimited, this method will always return <code>true</code>.
-	 *
-	 * @param entity the {@link Entity} to test
-	 * @return <code>true</code> if the {@link Entity} is within the area, <code>false</code> otherwise
-	 */
-	private boolean isWithinConfinedArea(Entity entity) {
-		var isUnlimited = configuration.isUnlimited();
-		if (isUnlimited) {
-			return true;
-		}
-
-		var maxX = configuration.getMaxX();
-		var maxY = configuration.getMaxY();
-		var maxZ = configuration.getMaxZ();
-		var minX = configuration.getMinX();
-		var minY = configuration.getMinY();
-		var minZ = configuration.getMinZ();
-
-		var location = entity.getLocation();
-		var x = location.getBlockX();
-		var y = location.getBlockY();
-		var z = location.getBlockZ();
-
-		return minX <= x && x <= maxX && minY <= y && y <= maxY && minZ <= z && z <= maxZ;
 	}
 }

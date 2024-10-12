@@ -12,7 +12,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 
@@ -38,14 +37,14 @@ public class GlassPaneService implements Listener {
 	private static final String TAG_YELLOW = "yellow";
 	private static final String TIMER_OBJECTIVE = "stickfight_timer";
 
-	private final JavaPlugin plugin;
 	private boolean running = false;
+	private final Stickfight stickfight;
 	private Objective timerObjective;
 	private TimerTask timerTask;
 	private final World world;
 
-	public GlassPaneService(JavaPlugin plugin, World world) {
-		this.plugin = plugin;
+	public GlassPaneService(Stickfight stickfight, World world) {
+		this.stickfight = stickfight;
 		this.world = world;
 		initScoreboard();
 	}
@@ -75,7 +74,7 @@ public class GlassPaneService implements Listener {
 		if (!running) {
 			// register events
 			var pluginManager = Bukkit.getPluginManager();
-			pluginManager.registerEvents(this, plugin);
+			pluginManager.registerEvents(this, stickfight);
 
 			// create timer task
 			timerTask = new TimerTask() {
@@ -87,7 +86,7 @@ public class GlassPaneService implements Listener {
 
 			// start timer
 			var scheduler = Bukkit.getScheduler();
-			scheduler.scheduleSyncRepeatingTask(plugin, timerTask, 0, 1);
+			scheduler.scheduleSyncRepeatingTask(stickfight, timerTask, 0, 1);
 
 			running = true;
 		}
@@ -102,13 +101,19 @@ public class GlassPaneService implements Listener {
 	}
 
 	private void breakIfGlassPane(Block block) {
+		// ignore blocks that are no glass panes
 		var material = block.getType();
 		if (!isGlassPane(material)) {
 			return;
 		}
 
-		// add placeholder
+		// ignore blocks outside the play area
 		var location = block.getLocation().add(0.5, 0.5, 0.5);
+		if (!stickfight.isWithinConfinedArea(location)) {
+			return;
+		}
+
+		// add placeholder
 		var armorStand = world.createEntity(location, ArmorStand.class);
 		armorStand.addScoreboardTag(TAG_STICKFIGHT);
 		armorStand.addScoreboardTag(TAG_PLACEHOLDER);
