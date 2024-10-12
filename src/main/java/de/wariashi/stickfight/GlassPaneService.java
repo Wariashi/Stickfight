@@ -1,5 +1,6 @@
 package de.wariashi.stickfight;
 
+import java.util.Set;
 import java.util.TimerTask;
 
 import org.bukkit.*;
@@ -16,24 +17,25 @@ import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Objective;
 
 public class GlassPaneService implements Listener {
-	private static final String PLACEHOLDER_TAG_BLACK = "stickfight_placeholder_black";
-	private static final String PLACEHOLDER_TAG_BLUE = "stickfight_placeholder_blue";
-	private static final String PLACEHOLDER_TAG_BROWN = "stickfight_placeholder_brown";
-	private static final String PLACEHOLDER_TAG_CLEAR = "stickfight_placeholder";
-	private static final String PLACEHOLDER_TAG_CYAN = "stickfight_placeholder_cyan";
-	private static final String PLACEHOLDER_TAG_GRAY = "stickfight_placeholder_gray";
-	private static final String PLACEHOLDER_TAG_GREEN = "stickfight_placeholder_green";
-	private static final String PLACEHOLDER_TAG_LIGHT_BLUE = "stickfight_placeholder_light_blue";
-	private static final String PLACEHOLDER_TAG_LIGHT_GRAY = "stickfight_placeholder_light_gray";
-	private static final String PLACEHOLDER_TAG_LIME = "stickfight_placeholder_lime";
-	private static final String PLACEHOLDER_TAG_MAGENTA = "stickfight_placeholder_magenta";
-	private static final String PLACEHOLDER_TAG_ORANGE = "stickfight_placeholder_orange";
-	private static final String PLACEHOLDER_TAG_PINK = "stickfight_placeholder_pink";
-	private static final String PLACEHOLDER_TAG_PURPLE = "stickfight_placeholder_purple";
-	private static final String PLACEHOLDER_TAG_RED = "stickfight_placeholder_red";
-	private static final String PLACEHOLDER_TAG_WHITE = "stickfight_placeholder_white";
-	private static final String PLACEHOLDER_TAG_YELLOW = "stickfight_placeholder_yellow";
 	private static final int RESPAWN_TIME = 60 * 20; // seconds * ticks per second
+	private static final String TAG_BLACK = "black";
+	private static final String TAG_BLUE = "blue";
+	private static final String TAG_BROWN = "brown";
+	private static final String TAG_CYAN = "cyan";
+	private static final String TAG_GRAY = "gray";
+	private static final String TAG_GREEN = "green";
+	private static final String TAG_LIGHT_BLUE = "light_blue";
+	private static final String TAG_LIGHT_GRAY = "light_gray";
+	private static final String TAG_LIME = "lime";
+	private static final String TAG_MAGENTA = "magenta";
+	private static final String TAG_ORANGE = "orange";
+	private static final String TAG_PINK = "pink";
+	private static final String TAG_PLACEHOLDER = "placeholder";
+	private static final String TAG_PURPLE = "purple";
+	private static final String TAG_RED = "red";
+	private static final String TAG_STICKFIGHT = "stickfight";
+	private static final String TAG_WHITE = "white";
+	private static final String TAG_YELLOW = "yellow";
 	private static final String TIMER_OBJECTIVE = "stickfight_timer";
 
 	private final JavaPlugin plugin;
@@ -101,15 +103,19 @@ public class GlassPaneService implements Listener {
 
 	private void breakIfGlassPane(Block block) {
 		var material = block.getType();
-		var placeholderTag = getTagForMaterial(material);
-		if (placeholderTag == null) {
+		if (!isGlassPane(material)) {
 			return;
 		}
 
 		// add placeholder
 		var location = block.getLocation();
 		var armorStand = world.createEntity(location, ArmorStand.class);
-		armorStand.addScoreboardTag(placeholderTag);
+		armorStand.addScoreboardTag(TAG_STICKFIGHT);
+		armorStand.addScoreboardTag(TAG_PLACEHOLDER);
+		var colorTag = getColorTag(material);
+		if (colorTag != null) {
+			armorStand.addScoreboardTag(colorTag);
+		}
 		armorStand.setBasePlate(false);
 		armorStand.setGravity(false);
 		armorStand.setInvisible(true);
@@ -126,50 +132,64 @@ public class GlassPaneService implements Listener {
 		}
 	}
 
-	private Material getMaterialForTag(String tag) {
-		return switch (tag) {
-			case PLACEHOLDER_TAG_CLEAR -> Material.GLASS_PANE;
-			case PLACEHOLDER_TAG_BLACK -> Material.BLACK_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_BLUE -> Material.BLUE_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_BROWN -> Material.BROWN_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_CYAN -> Material.CYAN_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_GRAY -> Material.GRAY_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_GREEN -> Material.GREEN_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_MAGENTA -> Material.MAGENTA_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_LIGHT_BLUE -> Material.LIGHT_BLUE_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_LIGHT_GRAY -> Material.LIGHT_GRAY_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_LIME -> Material.LIME_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_ORANGE -> Material.ORANGE_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_PINK -> Material.PINK_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_PURPLE -> Material.PURPLE_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_RED -> Material.RED_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_YELLOW -> Material.YELLOW_STAINED_GLASS_PANE;
-			case PLACEHOLDER_TAG_WHITE -> Material.WHITE_STAINED_GLASS_PANE;
+	private String getColorTag(Material material) {
+		return switch (material) {
+			case BLACK_STAINED_GLASS_PANE -> TAG_BLACK;
+			case BLUE_STAINED_GLASS_PANE -> TAG_BLUE;
+			case BROWN_STAINED_GLASS_PANE -> TAG_BROWN;
+			case CYAN_STAINED_GLASS_PANE -> TAG_CYAN;
+			case GRAY_STAINED_GLASS_PANE -> TAG_GRAY;
+			case GREEN_STAINED_GLASS_PANE -> TAG_GREEN;
+			case MAGENTA_STAINED_GLASS_PANE -> TAG_MAGENTA;
+			case LIGHT_BLUE_STAINED_GLASS_PANE -> TAG_LIGHT_BLUE;
+			case LIGHT_GRAY_STAINED_GLASS_PANE -> TAG_LIGHT_GRAY;
+			case LIME_STAINED_GLASS_PANE -> TAG_LIME;
+			case ORANGE_STAINED_GLASS_PANE -> TAG_ORANGE;
+			case PINK_STAINED_GLASS_PANE -> TAG_PINK;
+			case PURPLE_STAINED_GLASS_PANE -> TAG_PURPLE;
+			case RED_STAINED_GLASS_PANE -> TAG_RED;
+			case YELLOW_STAINED_GLASS_PANE -> TAG_YELLOW;
+			case WHITE_STAINED_GLASS_PANE -> TAG_WHITE;
 			default -> null;
 		};
 	}
 
-	private String getTagForMaterial(Material material) {
-		return switch (material) {
-			case GLASS_PANE -> PLACEHOLDER_TAG_CLEAR;
-			case BLACK_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_BLACK;
-			case BLUE_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_BLUE;
-			case BROWN_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_BROWN;
-			case CYAN_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_CYAN;
-			case GRAY_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_GRAY;
-			case GREEN_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_GREEN;
-			case MAGENTA_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_MAGENTA;
-			case LIGHT_BLUE_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_LIGHT_BLUE;
-			case LIGHT_GRAY_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_LIGHT_GRAY;
-			case LIME_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_LIME;
-			case ORANGE_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_ORANGE;
-			case PINK_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_PINK;
-			case PURPLE_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_PURPLE;
-			case RED_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_RED;
-			case YELLOW_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_YELLOW;
-			case WHITE_STAINED_GLASS_PANE -> PLACEHOLDER_TAG_WHITE;
-			default -> null;
-		};
+	private Material getMaterialForTags(Set<String> tags) {
+		if (tags.contains(TAG_BLACK)) {
+			return Material.BLACK_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_BLUE)) {
+			return Material.BLUE_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_BROWN)) {
+			return Material.BROWN_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_CYAN)) {
+			return Material.CYAN_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_GRAY)) {
+			return Material.GRAY_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_GREEN)) {
+			return Material.GREEN_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_MAGENTA)) {
+			return Material.MAGENTA_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_LIGHT_BLUE)) {
+			return Material.LIGHT_BLUE_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_LIGHT_GRAY)) {
+			return Material.LIGHT_GRAY_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_LIME)) {
+			return Material.LIME_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_ORANGE)) {
+			return Material.ORANGE_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_PINK)) {
+			return Material.PINK_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_PURPLE)) {
+			return Material.PURPLE_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_RED)) {
+			return Material.RED_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_YELLOW)) {
+			return Material.YELLOW_STAINED_GLASS_PANE;
+		} else if (tags.contains(TAG_WHITE)) {
+			return Material.WHITE_STAINED_GLASS_PANE;
+		} else {
+			return Material.GLASS_PANE;
+		}
 	}
 
 	private void initScoreboard() {
@@ -182,27 +202,48 @@ public class GlassPaneService implements Listener {
 		}
 	}
 
+	private boolean isGlassPane(Material material) {
+		return switch (material) {
+			case GLASS_PANE,
+				 BLACK_STAINED_GLASS_PANE,
+				 BLUE_STAINED_GLASS_PANE,
+				 BROWN_STAINED_GLASS_PANE,
+				 CYAN_STAINED_GLASS_PANE,
+				 GRAY_STAINED_GLASS_PANE,
+				 GREEN_STAINED_GLASS_PANE,
+				 MAGENTA_STAINED_GLASS_PANE,
+				 LIGHT_BLUE_STAINED_GLASS_PANE,
+				 LIGHT_GRAY_STAINED_GLASS_PANE,
+				 LIME_STAINED_GLASS_PANE,
+				 ORANGE_STAINED_GLASS_PANE,
+				 PINK_STAINED_GLASS_PANE,
+				 PURPLE_STAINED_GLASS_PANE,
+				 RED_STAINED_GLASS_PANE,
+				 YELLOW_STAINED_GLASS_PANE,
+				 WHITE_STAINED_GLASS_PANE -> true;
+			default -> false;
+		};
+	}
+
 	private void tick() {
 		var entities = world.getEntities();
 		for (var entity : entities) {
 			var tags = entity.getScoreboardTags();
-			for (var tag : tags) {
-				var material = getMaterialForTag(tag);
-				if (material != null) {
-					var entityId = String.valueOf(entity.getEntityId());
-					var score = timerObjective.getScore(entityId);
+			if (tags.contains(TAG_STICKFIGHT) && tags.contains(TAG_PLACEHOLDER)) {
+				var entityId = String.valueOf(entity.getEntityId());
+				var score = timerObjective.getScore(entityId);
 
-					// reset glass panes
-					if (RESPAWN_TIME <= score.getScore()) {
-						var location = entity.getLocation();
-						var block = world.getBlockAt(location);
-						block.setType(material);
-						entity.remove();
-					}
-
-					// update timer
-					score.setScore(score.getScore() + 1);
+				// reset glass panes
+				if (RESPAWN_TIME <= score.getScore()) {
+					var location = entity.getLocation();
+					var block = world.getBlockAt(location);
+					var material = getMaterialForTags(tags);
+					block.setType(material);
+					entity.remove();
 				}
+
+				// update timer
+				score.setScore(score.getScore() + 1);
 			}
 		}
 	}
