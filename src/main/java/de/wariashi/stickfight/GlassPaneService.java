@@ -108,7 +108,7 @@ public class GlassPaneService implements Listener {
 		}
 
 		// add placeholder
-		var location = block.getLocation();
+		var location = block.getLocation().add(0.5, 0.5, 0.5);
 		var armorStand = world.createEntity(location, ArmorStand.class);
 		armorStand.addScoreboardTag(TAG_STICKFIGHT);
 		armorStand.addScoreboardTag(TAG_PLACEHOLDER);
@@ -125,9 +125,10 @@ public class GlassPaneService implements Listener {
 		// break block
 		block.breakNaturally();
 
-		// play sound
+		// spawn particles and play a sound effect
 		var onlinePlayers = Bukkit.getOnlinePlayers().toArray(new Player[0]);
 		for (var player : onlinePlayers) {
+			player.spawnParticle(Particle.BLOCK, location, 16, material.createBlockData());
 			player.playSound(location, Sound.BLOCK_GLASS_BREAK, 1, 1);
 		}
 	}
