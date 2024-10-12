@@ -231,8 +231,8 @@ public class GlassPaneService implements Listener {
 		for (var entity : entities) {
 			var tags = entity.getScoreboardTags();
 			if (tags.contains(TAG_STICKFIGHT) && tags.contains(TAG_PLACEHOLDER)) {
-				var entityId = String.valueOf(entity.getEntityId());
-				var score = timerObjective.getScore(entityId);
+				var uuid = entity.getUniqueId();
+				var score = timerObjective.getScore(uuid.toString());
 
 				// reset glass panes
 				if (RESPAWN_TIME <= score.getScore()) {
