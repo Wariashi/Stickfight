@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -168,6 +169,26 @@ public class GlassPaneService implements Listener {
 	}
 
 	/**
+	 * Fixes connections to adjacent blocks if the {@link Block} is a {@link MultipleFacing} block.
+	 *
+	 * @param block the {@link Block} to fix
+	 */
+	private void fixConnections(Block block) {
+		var blockData = block.getBlockData();
+		if (blockData instanceof MultipleFacing multipleFacing) {
+			var allowedFaces = multipleFacing.getAllowedFaces();
+			for (var face : allowedFaces) {
+				var relative = block.getRelative(face);
+				var material = relative.getType();
+				if (material.isSolid()) {
+					multipleFacing.setFace(face, true);
+				}
+			}
+			block.setBlockData(blockData);
+		}
+	}
+
+	/**
 	 * Returns a String describing the color of a glass pane.
 	 *
 	 * @param material the {@link Material} to check
@@ -299,6 +320,7 @@ public class GlassPaneService implements Listener {
 					var block = world.getBlockAt(location);
 					var material = getMaterialForTags(tags);
 					block.setType(material);
+					fixConnections(block);
 					entity.remove();
 				}
 
