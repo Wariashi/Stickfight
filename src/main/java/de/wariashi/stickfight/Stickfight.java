@@ -97,11 +97,15 @@ public class Stickfight extends JavaPlugin implements Listener {
 		for (var player : players) {
 			var gameMode = player.getGameMode();
 			var location = player.getLocation();
-			if (gameMode == GameMode.ADVENTURE && isWithinConfinedArea(location)) {
-				var stick = new ItemStack(Material.STICK);
-				stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 5);
+			if (gameMode == GameMode.ADVENTURE) {
 				var inventory = player.getInventory();
-				inventory.setItem(0, stick);
+				if (isWithinConfinedArea(location)) {
+					var stick = new ItemStack(Material.STICK);
+					stick.addUnsafeEnchantment(Enchantment.KNOCKBACK, 5);
+					inventory.setItem(0, stick);
+				} else {
+					inventory.setItem(0, null);
+				}
 			}
 		}
 	}
