@@ -13,6 +13,11 @@ public class Configuration {
 	private final FileConfiguration fileConfiguration;
 
 	/**
+	 * The config key to configure the y coordinate where players will be killed.
+	 */
+	private static final String KILL_LAYER = "kill-layer";
+
+	/**
 	 * The config key to configure the maximum x coordinate of the play area.
 	 */
 	private static final String MAX_X = "play-area.max.x";
@@ -58,6 +63,13 @@ public class Configuration {
 		options.copyDefaults(true);
 		addDefaults();
 		plugin.saveConfig();
+	}
+
+	/**
+	 * @return the y coordinate where players will be killed.
+	 */
+	public long getKillLayer() {
+		return fileConfiguration.getLong(KILL_LAYER);
 	}
 
 	/**
@@ -113,6 +125,7 @@ public class Configuration {
 	 * Adds the missing default values to the config file.
 	 */
 	private void addDefaults() {
+		fileConfiguration.addDefault(KILL_LAYER, -20);
 		fileConfiguration.addDefault(MAX_X, 10);
 		fileConfiguration.addDefault(MAX_Y, 10);
 		fileConfiguration.addDefault(MAX_Z, 10);

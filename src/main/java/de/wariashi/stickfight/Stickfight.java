@@ -1,14 +1,12 @@
 package de.wariashi.stickfight;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -84,6 +82,33 @@ public class Stickfight extends JavaPlugin implements Listener {
 			if (material != Material.BELL) {
 				event.setCancelled(true);
 			}
+		}
+	}
+
+	/**
+	 * Kills all {@link Player players} in or below the kill layer if they are in {@link GameMode#ADVENTURE adventure mode}.
+	 *
+	 * @param event the event that is called when a player moves
+	 * @see Configuration#getKillLayer()
+	 */
+	@EventHandler
+	public void onPlayerMove(PlayerMoveEvent event) {
+		var player = event.getPlayer();
+		var gameMode = player.getGameMode();
+		if (gameMode != GameMode.ADVENTURE) {
+			return;
+		}
+
+		var location = player.getLocation();
+		var y = location.getBlockY();
+		var killLayer = configuration.getKillLayer();
+		if (y <= killLayer) {
+			var onlinePlayers = Bukkit.getOnlinePlayers().toArray(new Player[0]);
+			for (var onlinePlayer : onlinePlayers) {
+				onlinePlayer.spawnParticle(Particle.LAVA, location, 50);
+				onlinePlayer.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_LARGE_BLAST, 1.0f, 1.0f);
+			}
+			player.setHealth(0.0);
 		}
 	}
 
