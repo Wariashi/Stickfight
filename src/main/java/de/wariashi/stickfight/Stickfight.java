@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Stickfight extends JavaPlugin implements Listener {
 	private Configuration configuration;
 	private GlassPaneService glassPaneService;
+	private KillCounterService killCounterService;
 
 	/**
 	 * Tests whether a {@link Location} is within the area that is specified in the {@link Configuration}.
@@ -44,6 +45,7 @@ public class Stickfight extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		glassPaneService.stop();
+		killCounterService.stop();
 	}
 
 	@Override
@@ -54,6 +56,8 @@ public class Stickfight extends JavaPlugin implements Listener {
 		configuration = new Configuration(this);
 		glassPaneService = new GlassPaneService(this, overworld);
 		glassPaneService.start();
+		killCounterService = new KillCounterService(this);
+		killCounterService.start();
 
 		var pluginManager = Bukkit.getPluginManager();
 		pluginManager.registerEvents(this, this);
