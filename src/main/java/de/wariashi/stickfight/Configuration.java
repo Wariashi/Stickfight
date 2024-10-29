@@ -115,7 +115,7 @@ public class Configuration {
 	}
 
 	/**
-	 * @return <code>true</code> it the play area should be unlimited, <code>false</code> otherwise
+	 * @return <code>true</code> if the play area should be unlimited, <code>false</code> otherwise
 	 */
 	public boolean isUnlimited() {
 		return fileConfiguration.getBoolean(UNLIMITED);
