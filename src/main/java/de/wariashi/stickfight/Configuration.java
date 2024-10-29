@@ -13,6 +13,11 @@ public class Configuration {
 	private final FileConfiguration fileConfiguration;
 
 	/**
+	 * The config key to configure whether a kill counter should be shown.
+	 */
+	private static final String KILL_COUNTER = "kill-counter";
+
+	/**
 	 * The config key to configure the y coordinate where players will be killed.
 	 */
 	private static final String KILL_LAYER = "kill-layer";
@@ -115,6 +120,13 @@ public class Configuration {
 	}
 
 	/**
+	 * @return <code>true</code> if a kill counter should be created.
+	 */
+	public boolean hasKillCounter() {
+		return fileConfiguration.getBoolean(KILL_COUNTER);
+	}
+
+	/**
 	 * @return <code>true</code> if the play area should be unlimited, <code>false</code> otherwise
 	 */
 	public boolean isUnlimited() {
@@ -125,6 +137,7 @@ public class Configuration {
 	 * Adds the missing default values to the config file.
 	 */
 	private void addDefaults() {
+		fileConfiguration.addDefault(KILL_COUNTER, true);
 		fileConfiguration.addDefault(KILL_LAYER, -20);
 		fileConfiguration.addDefault(MAX_X, 10);
 		fileConfiguration.addDefault(MAX_Y, 10);

@@ -57,7 +57,9 @@ public class Stickfight extends JavaPlugin implements Listener {
 		glassPaneService = new GlassPaneService(this, overworld);
 		glassPaneService.start();
 		killCounterService = new KillCounterService(this);
-		killCounterService.start();
+		if (configuration.hasKillCounter()) {
+			killCounterService.start();
+		}
 
 		var pluginManager = Bukkit.getPluginManager();
 		pluginManager.registerEvents(this, this);

@@ -75,7 +75,9 @@ public class KillCounterService implements Listener {
 	 */
 	public void stop() {
 		HandlerList.unregisterAll(this);
-		killsObjective.unregister();
+		if (killsObjective != null) {
+			killsObjective.unregister();
+		}
 		running = false;
 	}
 
