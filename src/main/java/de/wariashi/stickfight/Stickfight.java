@@ -1,5 +1,7 @@
 package de.wariashi.stickfight;
 
+import de.wariashi.stickfight.service.GlassPaneService;
+import de.wariashi.stickfight.service.KillCounterService;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;

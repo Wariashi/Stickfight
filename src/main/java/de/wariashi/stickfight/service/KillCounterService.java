@@ -1,5 +1,6 @@
-package de.wariashi.stickfight;
+package de.wariashi.stickfight.service;
 
+import de.wariashi.stickfight.Stickfight;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;

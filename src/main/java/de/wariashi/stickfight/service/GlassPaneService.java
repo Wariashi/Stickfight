@@ -1,8 +1,9 @@
-package de.wariashi.stickfight;
+package de.wariashi.stickfight.service;
 
 import java.util.Set;
 import java.util.TimerTask;
 
+import de.wariashi.stickfight.Stickfight;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
