@@ -87,7 +87,7 @@ public class Stickfight extends JavaPlugin implements Listener {
 		var block = event.getClickedBlock();
 		if (block != null) {
 			var material = block.getType();
-			if (material != Material.BELL) {
+			if (material != Material.BELL && material != Material.BIG_DRIPLEAF) {
 				event.setCancelled(true);
 			}
 		}
